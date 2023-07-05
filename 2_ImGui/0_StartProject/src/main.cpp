@@ -108,18 +108,18 @@ int main(int, char **)
 
     WindowClass window_obj;
 
+    ImPlot::CreateContext();
     while (!glfwWindowShouldClose(window))
     {
         start_cycle();
 
         ImGui::NewFrame();
-        ImPlot::CreateContext();
         render(window_obj);
-        ImPlot::DestroyContext();
         ImGui::Render();
 
         end_cycle(window);
     }
+    ImPlot::DestroyContext();
 
     // Cleanup
     ImGui_ImplOpenGL3_Shutdown();

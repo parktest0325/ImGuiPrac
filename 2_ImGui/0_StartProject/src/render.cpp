@@ -18,7 +18,6 @@ void WindowClass::Draw(std::string_view label)
     ImGui::SetNextWindowPos(window_pos);
 
     ImGui::Begin(label.data(), nullptr, window_flags);
-
     ImGui::End();
 }
 
