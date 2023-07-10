@@ -35,10 +35,8 @@ void WindowClass::Draw(std::string_view label)
 
 void WindowClass::DrawSizeButtons()
 {
-    auto user_added_rows = false;
-    auto user_dropped_rows = false;
-    auto user_added_cols = false;
-    auto user_dropped_cols = false;
+    auto user_control_rows = false;
+    auto user_control_cols = false;
 
     auto slider_value_rows = rowSize;
     auto slider_value_cols = colSize;
@@ -47,77 +45,54 @@ void WindowClass::DrawSizeButtons()
     ImGui::SameLine();
     if (ImGui::SliderInt("##numRows", &slider_value_rows, 0, maxNumRows))
     {
-        user_added_rows = slider_value_rows > rowSize;
-        user_dropped_rows = !user_added_rows;
-
+        user_control_rows = true;
         rowSize = slider_value_rows;
     }
     ImGui::SameLine();
     if (ImGui::Button("Add Row") && rowSize < maxNumRows)
     {
         ++rowSize;
-        user_added_rows = true;
+        user_control_rows = true;
     }
     ImGui::SameLine();
     if (ImGui::Button("Drop Row") && rowSize > 0)
     {
         --rowSize;
-        user_dropped_rows = true;
+        user_control_rows = true;
     }
 
     ImGui::Text("Num Cols: ");
     ImGui::SameLine();
     if (ImGui::SliderInt("##numCols", &slider_value_cols, 0, maxNumCols))
     {
-        user_added_cols = slider_value_cols > colSize;
-        user_dropped_cols = !user_added_cols;
-
+        user_control_cols = true;
         colSize = slider_value_cols;
     }
     ImGui::SameLine();
     if (ImGui::Button("Add Col") && colSize < maxNumCols)
     {
         ++colSize;
-        user_added_cols = true;
+        user_control_cols = true;
     }
     ImGui::SameLine();
     if (ImGui::Button("Drop Col") && colSize > 0)
     {
         --colSize;
-        user_dropped_cols = true;
+        user_control_cols = true;
     }
 
-    const auto num_rows_i32 = static_cast<std::int32_t>(data.size());
-    if (user_added_rows)
+    if (user_control_rows)
     {
-        for (auto row = num_rows_i32; row < rowSize; ++row)
-        {
-            data.push_back(std::vector<float>(colSize, 0.0f));
-        }
+        data.resize(rowSize, std::vector<float>(colSize, 0.0f));
     }
-    else if (user_added_cols)
+    else if (user_control_cols)
     {
         for (auto row = 0; row < rowSize; ++row)
         {
             data[row].resize(colSize, 0.0f);
         }
     }
-    else if (user_dropped_rows)
-    {
-        for (auto row = num_rows_i32; row > rowSize; --row)
-        {
-            data.pop_back();
-        }
-    }
-    else if (user_dropped_cols)
-    {
-        for (auto row = 0; row < rowSize; ++row)
-        {
-            data[row].resize(colSize, 0.0f);
-        }
-    }
-
-}
+ }
 
 void WindowClass::DrawIoButtons()
 {
@@ -149,7 +124,6 @@ void WindowClass::DrawTable()
         return;
 
     ImGui::BeginTable("Table", colSize, table_flags);
-
     for (std::int32_t col = 0; col < colSize; ++col)
     {
         const auto col_name = fmt::format("{}", 'A' + col);
