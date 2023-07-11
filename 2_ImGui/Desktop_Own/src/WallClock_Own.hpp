@@ -5,7 +5,9 @@
 #include <numbers>
 #include <tuple>
 
-class Clock
+#include "WindowBase.hpp"
+
+class Clock : public WindowBase
 {
 private:
     static constexpr auto PI = std::numbers::pi_v<float>;
@@ -23,7 +25,7 @@ private:
 
 public:
     Clock() : secs(0), mins(0), hrs(0), center({}){};
-    void Draw(std::string_view label);
+    virtual void Draw(std::string_view label, bool *open = nullptr) final;
 
     void GetTime();
 

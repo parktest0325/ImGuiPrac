@@ -6,7 +6,7 @@
 
 #include "Desktop_Own.hpp"
 
-void Desktop::Draw(std::string_view label)
+void Desktop::Draw(std::string_view label, bool *open)
 {
     constexpr static auto window_flags =
         ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
@@ -18,13 +18,12 @@ void Desktop::Draw(std::string_view label)
     ImGui::SetNextWindowSize(window_size);
     ImGui::SetNextWindowPos(window_pos);
 
-    ImGui::Begin(label.data(), nullptr, window_flags);
+    ImGui::Begin(label.data(), open, window_flags);
 
     DrawDesktop();
     DrawTaskbar();
 
     ImGui::End();
-
 }
 
 void Desktop::DrawDesktop()
@@ -49,7 +48,7 @@ void Desktop::DrawTaskbar()
 
     ImGui::Begin("Taskbar", nullptr, taskbar_flags);
 
-    if (ImGui::Button("All Icons"))
+    if (ImGui::Button("All Icons", ImVec2(100.0F, 30.0F)))
     {
         ImGui::OpenPopup("My Programs");
         open_taskbar = true;
@@ -60,7 +59,16 @@ void Desktop::DrawTaskbar()
 
     ImGui::SameLine();
 
-    ImGui::SetCursorPosX(ImGui::GetContentRegionAvail().x);
+    static auto theme_open = false;
+    if (ImGui::Button("Theme", ImVec2(100.0F, 30.0F)) || theme_open)
+    {
+        theme_open = true;
+        DrawColorsSettings(&theme_open);
+    }
+
+    ImGui::SameLine();
+
+    ImGui::SetCursorPosX(mainWindowSize.x - 100.0f);
     static auto clock_open = false;
     clock.GetTime();
     const auto time = fmt::format("{}:{}", clock.hrs, clock.mins);
@@ -82,12 +90,12 @@ void Desktop::ShowIconList(bool *open)
     const auto selectable_height = ImGui::GetTextLineHeightWithSpacing();
     const auto popup_height = selectable_height * numIcons + 40.0f;
 
-
     ImGui::SetNextWindowSize(ImVec2(100.0f, popup_height), ImGuiCond_Always);
     ImGui::SetNextWindowPos(ImVec2(0.0f, 680.0f - popup_height),
                             ImGuiCond_Always);
 
     if (ImGui::BeginPopupModal("My Programs", open, ImGuiWindowFlags_NoResize))
+
     {
         for (auto &icon : icons)
         {
@@ -104,40 +112,16 @@ void Desktop::ShowIconList(bool *open)
 
 void Desktop::Icon::Draw()
 {
-    constexpr static auto icon_window_flags = ImGuiWindowFlags_NoCollapse |
-                                          ImGuiWindowFlags_NoScrollbar;
-    constexpr static auto button_size = ImVec2(100.0f, 50.0f);
+    constexpr static auto flags =
+        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse;
 
-    const auto label_icon_window = fmt::format("IconWindow##{}", label);
-    const auto label_icon_popup = fmt::format("IconPopup##{}", label);
-
-    ImGui::SetNextWindowSize(position, ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowPos(
-        ImVec2(button_size.x + 35.0f, button_size.y + 35.0f),
-        ImGuiCond_FirstUseEver);
-
-    ImGui::Begin(label_icon_window.data(), nullptr, icon_window_flags);
-    if (ImGui::Button(label.data(), button_size))
+    ImGui::SetNextWindowPos(position, ImGuiCond_FirstUseEver);
+    ImGui::Begin(fmt::format("###{}", label).data(), nullptr, flags);
+    if (ImGui::Button(label.data(), ImVec2(100.0F, 50.0F)) || popupOpen)
     {
-        ++clickCount;
-    }
-    if (clickCount >= 1 || popupOpen)
-    {
-        ImGui::OpenPopup(label_icon_popup.data());
-        clickCount = 0;
         popupOpen = true;
+        base->Draw(label, &popupOpen);
     }
-    if (ImGui::BeginPopupModal(label_icon_popup.data(), &popupOpen))
-    {
-        ImGui::Text("Hi");
-        if (ImGui::Button("Close"))
-        {
-            popupOpen = false;
-            ImGui::CloseCurrentPopup();
-        }
-        ImGui::EndPopup();
-    }
-
     ImGui::End();
 }
 

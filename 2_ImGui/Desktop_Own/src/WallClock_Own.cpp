@@ -9,18 +9,13 @@
 
 #include "WallClock_Own.hpp"
 
-void Clock::Draw(std::string_view label)
+void Clock::Draw(std::string_view label, bool *open)
 {
-    constexpr static auto window_flags =
-        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
-        ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar;
-    constexpr static auto window_size = ImVec2(1280.0F, 720.0F);
-    constexpr static auto window_pos = ImVec2(0.0F, 0.0F);
 
-    ImGui::SetNextWindowSize(window_size);
-    ImGui::SetNextWindowPos(window_pos);
+    ImGui::SetNextWindowSize(mainWindowSize);
+    ImGui::SetNextWindowPos(mainWindowPos);
 
-    ImGui::Begin(label.data(), nullptr, window_flags);
+    ImGui::Begin(label.data(), open, mainWindowFlags);
 
     const auto cursor_pos = ImGui::GetCursorScreenPos();
     center = ImVec2(cursor_pos.x + circleRadius, cursor_pos.y + circleRadius);
@@ -119,6 +114,7 @@ void Clock::DrawDigitalClock()
 {
     ImGui::Text("%d:%d:%d", hrs, mins, secs);
 }
+
 
 void Clock::GetTime()
 {

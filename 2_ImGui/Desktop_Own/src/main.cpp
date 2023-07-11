@@ -119,6 +119,7 @@ int main(int, char **)
 
         end_cycle(window);
     }
+    desktop_obj.SaveTheme();
 
     ImPlot::DestroyContext();
 

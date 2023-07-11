@@ -38,6 +38,26 @@ add_executable(${PROJECT_NAME}
     src/main.cpp
     src/Desktop_Own.cpp
     src/WallClock_Own.cpp
+    src/Calendar_Own.cpp
+    src/CsvTool_Own.cpp
+    src/DiffViewer_Own.cpp
+    src/FileExplorer_Own.cpp
+    src/Paint_Own.cpp
+    src/Plotter_Own.cpp
+    src/TextEditor_Own.cpp
+
+    "src/OtherTopics.cpp"
+    "src/UiHelpers.cpp"
+    "src/WindowBase.cpp"
+    "external/lodepng.cpp"
+)
+
+add_compile_definitions(
+    IMGUI_USER_CONFIG="${CMAKE_SOURCE_DIR}/external/my_imgui_config.h"
+)
+
+add_compile_definitions(
+    PROJECT_PATH="${CMAKE_SOURCE_DIR}"
 )
 
 add_compile_definitions(NOMINMAX)
@@ -49,6 +69,8 @@ target_set_warnings(TARGET ${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     src
+    external
+    ${SIMPLEINI_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
